@@ -37,6 +37,8 @@ $ grep -nri [搜索词] docs | cat --number
 $ grep -nri css docs | cat --number
 ```
 
+4、使用Obsidian中内置的搜索。
+
 # 未来工作
 - [ ] web 主页
 	- [ ] 支持Obsidian核心插件
