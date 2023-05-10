@@ -17,8 +17,26 @@ WanVe Libraries非常重视文档教程的专业性，并且致力于提供适�
 ```
 https://github.com/QinMoXX/WanVeLibraries.git
 ```
-2. 安装Obsidian客户端
+
+2. 安装Obsidian客户端  
 地址：https://obsidian.md/
+
+## 如何搜索
+1、使用 GitHub 自带的网页搜索。
+
+2、使用 [QinMoXX/WanVeLibraries - Sourcegraph](https://sourcegraph.com/github.com/QinMoXX/WanVeLibraries) 进行搜索。
+
+3、将这个仓库克隆到本地，然后在仓库目录使用下面的命令
+```
+$ grep -nri [搜索词] docs | cat --number
+```
+
+比如，搜索 CSS 相关内容。
+
+```
+$ grep -nri css docs | cat --number
+```
+
 
 # 使用到的plugin
 Admonition（已上传）
@@ -32,5 +50,5 @@ Advanced Tables （已上传）
 | ---------- | -------------------- | -------------------- |
 | Attached   | 附件文件夹           |                      |
 | Excalidraw | Excalidraw附件文件夹 |                      |
-| Overview   | 目录大纲             | 文章汇总             |
+| [Overview](Overview)   | 目录大纲             | 文章汇总             |
 | Monograph  | 文章目录             | 所有知识卡片的汇集处 | 
