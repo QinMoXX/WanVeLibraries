@@ -1,0 +1,2 @@
+# WanVeLibraries
+WanVe Libraries是一个基于Obsidian开源共享的专业知识图谱库，汇聚了来自全球各个领域的专业知识和经验，并提供可视化的知识展示和查询服务。
