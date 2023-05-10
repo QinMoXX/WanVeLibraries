@@ -37,6 +37,12 @@ $ grep -nri [搜索词] docs | cat --number
 $ grep -nri css docs | cat --number
 ```
 
+# 未来工作
+- [ ] web 主页
+	- [ ] 支持Obsidian核心插件
+	- [ ] 支持Obsidian第三方插件
+- [ ] 快速集成平台部署
+- [ ] 个人web部署
 
 # 使用到的plugin
 Admonition（已上传）
