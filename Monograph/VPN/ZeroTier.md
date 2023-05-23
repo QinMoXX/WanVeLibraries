@@ -1,3 +1,11 @@
+---
+title: ZeroTier
+author: QinMo
+date: 2023-04-26 23:30:09
+modified_date: 2023-05-22 22:37:11 
+tags: Document VPN
+alias: 
+---
 
 # Zerotier Moon
 通过在Zerotier Network中建立的虚拟局域网进行访问时，zertier one建立加密通道，网络环境优良时能够通过Udp穿透建立通畅的隧道，但在NAT层数以及其他网络限制的情况下这样的隧道无法建立🚫，此次zerotier的传输策略将会变成由zertier官方的服务器做流量转发。
@@ -26,9 +34,9 @@ cd /var/lib/zerotier-one
 ```
 
 生成moon.json 文件
-```ad-tip
-❗注意一下命令都需要root用户执行,或root权限
-```
+> [!info]
+>❗注意一下命令都需要 root 用户执行,或 root 权限
+
 
 ```Bash
 zerotier-idtool initmoon identity.public >> moon.json
@@ -39,9 +47,9 @@ zerotier-idtool initmoon identity.public >> moon.json
 vim moon.json
 ```
 
-```ad-tip
-修改(这里一定要带""还有端口一定要用/
-```
+> [!info]
+> 修改(这里一定要带""还有端口一定要用/
+
 
 ```json
 //只修改"stableEndpoints": ["服务器公网IP/9993"]
@@ -76,9 +84,9 @@ systemctl restart zerotier-one
 sudo zerotier-cli orbit [moon.json文件中的id] [moon.json文件中的id]
 ```
 - Windows
-```ad-tip
-需要使用管理员权限的 PowerShell 输入
-```
+> [!info]
+> 需要使用管理员权限的 PowerShell 输入
+
 
 ```PowerShell
 zerotier-cli orbit [moon.json文件中的id] [moon.json文件中的id]
