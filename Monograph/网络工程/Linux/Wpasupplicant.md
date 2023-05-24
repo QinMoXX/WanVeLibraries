@@ -23,9 +23,9 @@ apt-get install -y wpasupplicant
 ```
 ### 启动 wpa_supplicant 守护进程并连接到指定的 WiFi 网络。 
 ```shell
-wpa_supplicant -B -i <interface> -c <config_file>
+wpa_supplicant -B -i [interface] -c<([config_file])
 #例如
-wpa_supplicant -B -i wlp0s20f3 -c (wpa_passphrase "1001" "4001001111")
+wpa_supplicant -B -i wlp0s20f3 -c<(wpa_passphrase "1001" "4001001111")
 ```
 ### 启动 wpa_supplicant 的命令行界面，可以在命令行中执行各种操作，如扫描无线网络、连接网络等。
 ```shell

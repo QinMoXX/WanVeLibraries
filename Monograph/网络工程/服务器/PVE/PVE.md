@@ -115,98 +115,167 @@ cd pvetools
 
 ---
 ### Zerotiler 安装
+[[ZeroTier]]
 
 ---
 ### Wifi 设置
-####查看是否配置无线网卡
-```shell
-ip a
+1. 用到了 wireless tools Wifi工具，首先安装它。
+```Shell
+apt install iw
 ```
->[!info]
-> 1. <font color="#ffc000">查看是否有 wlp 的无线网卡，没有的话下面都不用看了</font>
-> 2. 使用 wifi 前需要<font color="#ffc000">替换 aliyun 企业源</font>，并关闭有效订阅提示 [[PVE#PVE Tools]]
 
-#### 激活无线网卡
- ConnMan 是什么
+2. 使用该命令查询可用网卡。
+```Shell
+iw dev
+```
+结果中包含名为 wlp0s20f3 的无线接口。
+```Shell
+root@pve:~# iw dev
+...
+        Interface wlp0s20f3
+                ifindex 3
+                wdev 0x1
+....
+```
 
-	ConnMan 是一个开源的网络连接管理器，它旨在提供一种简单而灵活的方式来管理网络连接。它可以管理各种类型的网络连接，包括无线、有线、蓝牙和移动宽带连接。ConnMan 还支持自动配置网络连接，包括 DHCP、IPv4、IPv6和 DNS 设置。它还提供了一组 API，供其他应用程序使用，以管理网络连接。ConnMan 最初是由 Intel 开发的，现在已经成为 Linux 的一部分，并得到了广泛的应用。
+#### 查看网卡状态
+使用该命令指定接口，获取接口状态，尖括号信息中未包含 UP 字样表示接口未激活。
+```Shell
+ip link show wlp0s20f3
+```
+在搜索可用 wifi 前需要将接口激活，指定好对应的接口名。
+```Shell
+ip link set wlp0s20f3 up
+```
 
-1. 安装 connman
-```shell
-apt-get install connman
+#### 搜寻可用 wifi
+```Shell
+iw wlp0s20f3 scan
 ```
-2. 进入 connman 控制器
-```shell
-connmanctl 
+或者使用 `grep` 语句匹配字符串
+```Shell
+iw wlan0 scan | grep [string]
 ```
-3. 激活 wifi
-```shell
-connmanctl> enable wifi
-```
-4. 扫描 wifi
-```shell
-connmanctl> scan wifi 
-Scan completed for wifi
-```
-5.  浏览 wifi
-```shell
-connmanctl> services 
-    你家wifi名字         wifi_685d43940516_54656e64615f423231413830_managed_psk
-...      ...
-```
-6.  开启代理
-```shell
-connmanctl> agent on
-Agent registered
-```
-7. 连接 wifi
-```shell
-connmanctl> connect wifi_685d43940516_54656e64615f423231413830_managed_psk 
-Agent RequestInput wifi_685d43940516_54656e64615f423231413830_managed_psk
-Passphrase = [ Type=psk, Requirement=mandatory, Alternates=[ WPS ] ]
-WPS = [ Type=wpspin, Requirement=alternate ]
-Passphrase? 输入密码
-Connected wifi_f8d111090ed6_6d617269636f6e5f64655f6d6965726461_managed_psk
-```
-8. 退出控制器
-```
-connmanctl> quit
-```
-#### 生成 wpa-psk 密钥
-[[Wpasupplicant]] 
 
+#### 连接 wifi
+
+连接 wifi 需要使用到工具 wpasupplicant
 1. 安装 wpasupplicant
 ```shell
 apt-get install -y wpasupplicant
 ```
 
-2. 创建密钥
-```shell
-wpa_passphrase "wifi名称" "wifi密码"
+2.  输入密码连接指定 wifi 
+```Shell
+wpa_supplicant -B -i wlp0s20f3 -c<(wpa_passphrase "SSID" "密码")
 ```
-3. 搜索 wifi
-```shell
-wpa_cli -i wlp2s0 scan         　     #搜索附件Wi-Fi热点
-wpa_cli -i wlp2s0 scan_result 　      #显示搜索Wi-Fi热点
-wpa_cli -i wlp2s0 status              #当前WPA/EAPOL/EAP通讯状态
+连接成功后会有如下输出
 ```
-#### 编辑网络配置
-```shell
-/etc/network/interfaces
+Successfully initialized wpa_supplicant
 ```
-处理过后
+
+3. 配置 wifi ip 地址
+```Shell
+ifconfig wlp0s20f3 192.168.199.200
+```
+使用 `ifconfig` 命令查询接口状态，正确分配了指定IP地址
+```Shell
+wlp0s20f3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.199.200  netmask 255.255.255.0  broadcast 0.0.0.0
+        inet6 fe80::2216:b9ff:fec0:92c  prefixlen 64  scopeid 0x20<link>
+        ether 20:16:b9:c0:09:2c  txqueuelen 1000  (Ethernet)
+        RX packets 95556  bytes 48739479 (46.4 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 128460  bytes 46266440 (44.1 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+
+#### wifi 自启动
+以上的 wifi 连接方式需要手动输入，而我们想要其在系统启动时自动连接 wifi 就必须进行一些配置。
+1. 修改接口文件：
+```shell
+vim /etc/network/interfaces
+```
+2. 将 wlp0s20f3 修改如下：
+使用 static 配置 ip 地址，并且端口启动时执行 /root/ip.config.sh 脚本
 ```shell
 auto lo
 iface lo inet loopback
 
-#iface enp7s0 inet none
+iface enp7s0 inet manual
 
-auto wlp0s20f3
+auto vmbr0
+iface vmbr0 inet manual
+	bridge-ports none
+	bridge-stp off
+	bridge-fd 0
+#	address 192.168.199.124/24	gateway 192.168.199.1
+# 即将启用 wifi 作为主端口，关闭桥接功能避免冲突。
+
+auto wlp0s20f3 # 接口开机启动
 iface wlp0s20f3 inet static
-	address 10.1.2.222
-	gateway 10.1.2.1
-	wpa-conf /etc/wpa.conf #生成的配置的地址
+	address 192.168.199.200/24
+	gateway 192.168.199.1
+	post-up bash /root/ip.config.sh # 启动时执行bash脚本
+```
+3. 创建启动脚本
+```Shell
+touch /root/ip.config.sh
+```
+4. 编辑脚本
+```Shell
+vim /root/ip.config.sh
 ```
 
+修改例子如下：
+```
+#!/usr/bin/env bash
+ wpa_supplicant -B -i wlp0s20f3 -c<(wpa_passphrase "1001" "4001001111")
+```
+
+重启服务器，wifi 能够自启动并且 ping 通外网地址表示成功。
+
 ---
-### Nat 桥接虚拟机
+### Nat 转发内部端口
+
+为虚拟机创建一个虚拟接口管理内部网络是一个较好的选择，独立网段便于管理，隔离内外网优点就不一一例举了。
+
+![[Drawing 2023-05-24 21.21.11.excalidraw]]
+
+#### 配置 VM1 虚拟端口
+
+1. 编辑文件
+```Shell
+vim /etc/network/interfaces
+```
+
+新增 vmbr1 端口，注意的是，网桥是关闭的。
+```
+auto vmbr1
+iface vmbr1 inet static
+	address 192.168.1.1/24
+	bridge-ports none
+	bridge-stp off
+	bridge-fd 0
+  post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+```
+
+配置 NAT ，添加一条自启动脚本
+```Shell
+  post-up bash /root/iptables.config.sh
+```
+
+编辑启动脚本，使用 iptables 命令添加 NAT 条目
+```Shell
+#!/usr/bin/env bash
+# 出站NAT转发来自'192.168.1.0/24'的端口到wlp0s20f3端口
+iptables -t nat -A POSTROUTING -s '192.168.1.0/24' -o wlp0s20f3 -j MASQUERADE
+
+# 入站NAT转发来自wlp0s20f3 445端口到 '192.168.1.100:445'
+iptables -t nat -A PREROUTING -i wlp0s20f3 -p tcp --dport 445 -j DNAT --to-destination 192.168.1.100:445
+# 入站NAT转发来自wlp0s20f3 433端口到 '192.168.1.100:443'
+iptables -t nat -A PREROUTING -i wlp0s20f3 -p tcp --dport 443 -j DNAT --to-destination 192.168.1.100:443
+```
+
+以上是几个示例，根据实际情况自行添加。
+
