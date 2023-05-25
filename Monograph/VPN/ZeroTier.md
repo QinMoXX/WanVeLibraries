@@ -6,6 +6,32 @@ modified_date: 2023-05-22 22:37:11
 tags: Document VPN
 alias: 
 ---
+# ZeroTier
+
+> ZeroTier 可让您构建几乎任何类型的现代化、安全的多点虚拟化网络。从强大的对等网络到多云网状基础设施，我们通过简单的本地网络实现全球连接。
+
+简单来说，这就是一款组建虚拟局域网的软件。
+
+## 安装 Zero
+
+> 下载地址 [Download (zerotier.com)](https://www.zerotier.com/download/)
+
+linux 平台使用 [[#安装 zerotier-one]] 方法。
+
+## 创建网络
+
+在 zeroTier 平台上操作
+1. 创建好自己的私有网络
+2. 配置网段地址
+
+## 加入网络
+windows 平台加入网络，右键 zeroTier 状态图标，Join New network -> 输入网络 Id。
+
+Linu 上加入网络
+```Shell
+zerotier-cli join [networkId]
+```
+
 
 # Zerotier Moon
 通过在Zerotier Network中建立的虚拟局域网进行访问时，zertier one建立加密通道，网络环境优良时能够通过Udp穿透建立通畅的隧道，但在NAT层数以及其他网络限制的情况下这样的隧道无法建立🚫，此次zerotier的传输策略将会变成由zertier官方的服务器做流量转发。

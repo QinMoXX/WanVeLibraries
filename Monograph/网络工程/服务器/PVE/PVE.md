@@ -20,6 +20,11 @@
 ---
 ## 系统安装
 
+> 参考文档：
+> [PVE是否直接安装docker？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/384631972/answer/2472979826)
+> [PVE系列教程(一)、PVE7.1.2版本系统安装 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/510216630)
+
+
 ### 官方网站
 [Proxmox](https://www.proxmox.com/en/)
 ### 备份数据
@@ -278,4 +283,3 @@ iptables -t nat -A PREROUTING -i wlp0s20f3 -p tcp --dport 443 -j DNAT --to-desti
 ```
 
 以上是几个示例，根据实际情况自行添加。
-
