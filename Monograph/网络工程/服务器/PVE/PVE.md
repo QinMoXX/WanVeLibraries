@@ -1,5 +1,5 @@
 ---
-作者: Joker_Sun
+作者: Joker_Sun QinMo
 创建时间: 2023-05-15 21:05:52
 修改时间: 2023-05-15 21:05:52 
 --- 
@@ -283,3 +283,53 @@ iptables -t nat -A PREROUTING -i wlp0s20f3 -p tcp --dport 443 -j DNAT --to-desti
 ```
 
 以上是几个示例，根据实际情况自行添加。
+
+# 存储设计
+
+我们以 PVE 作为硬件的管理平台，存储空间的规划也是一个设计重点。
+在设计上我们理应追求几个要点：
+1. 高效：存储作为首要需求，外部读取写入访问过程尽量简捷；
+2. 安全：多用户多服务带来了一定的权限管理需求，毕竟所有用户和服务都拥有完全的系统控制权限后患无穷；
+3. 共享：不同的虚拟机中共享存储，而不是使用其他虚拟机的服务，能够单服务独立可用；
+4. 可持续：服务出现问题，设备宕机都在可承受范围内，但是数据不能够丢失，即使硬件损坏将数据迁移仍然能够保证服务继续运行这是最关键的；
+
+如何将平台利用平台的硬件设备高效的将存储服务向外部提供，这一部分在 TrueNas [[NAS]] 中展示。TrueNAS 系统为我们提供了规范细致的权限组划分，以及数据集的权限分配为多用户多服务提供有利保障。
+但在 NAS 服务拥有存储管理权限的时候，我们仍然希望利用存储中的数据对外提供多媒体访问、代码仓库等其他服务，也就是说某一块或多块存储空间能够被多个虚拟机访问。
+
+早些的时候，我们是将硬盘全交由内部的 TrueNAS 管理，其他虚拟机的访问通过 TrueNAS 提供的网络服务访问，✅这样配置简单管理方便，TrueNAS 可以直接控制访问权限。❗但随后衍生出一个问题，当 NAS 服务宕机时其他的上层服务将不可避免的陷入瘫痪。
+![[Drawing 2023-05-30 14.17.24.excalidraw]]
+
+现在我们根据这个方案进行改进，硬件的控制权交由 PVE，利用 ZFS 文件系统虚拟机的之间访问相同的数据池，为了安全要点会将不同硬盘根据存储内容分成多个池挂载到不同的虚拟机。
+![[Drawing 2023-05-30 13.39.27.excalidraw]]
+
+## 硬盘分区
+
+
+## 挂载硬盘
+> 参考资料
+> [How to: Passthrough HDD/SSD/Physical disks to VM on Proxmox VE(PVE) > Blog-D without Nonsense --- 如何：将 HDD/SSD/物理磁盘直通到 Proxmox VE 上的 VM（PVE）> Blog-D without Nonsense (dannyda.com)](https://dannyda.com/2020/08/26/how-to-passthrough-hdd-ssd-physical-disks-to-vm-on-proxmox-vepve/)
+> [Passthrough Physical Disk to Virtual Machine (VM) - Proxmox VE --- 直通物理磁盘到虚拟机 (VM) - Proxmox VE]( https://pve.proxmox.com/wiki/Passthrough_Physical_Disk_to_Virtual_Machine_ (VM))
+
+进入 PVE 的 SSH，查看当前磁盘
+
+```Shell
+ls /dev/disk/by-id
+```
+
+目录下显示的是所有硬盘的序列号，这里需要挂载的是 ata-WDC_WD10SPZX-22Z10T1_WD-WXA1A5866E8A，以 scsi 的形式挂载到虚拟机 100 上。
+```Shell
+qm set 100 -scsi2 /dev/disk/by-id/ata-WDC_WD10SPZX-22Z10T1_WD-WXA1A5866E8A
+```
+
+输出 Update 表示成功。
+```
+update VM 100: -scsi2 /dev/disk/by-id/ata-xxxxxxxxx-xxxxx_xxx
+```
+
+相关命令
+移除虚拟磁盘
+```Shell
+qm unlink 100 --idlist scsi2
+```
+
+如果我们想附加另一个磁盘，我们可以使用-scsi1 或-scsi2 或-scsi3 等......
