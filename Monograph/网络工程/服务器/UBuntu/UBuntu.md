@@ -46,7 +46,8 @@ deb-src http://security.ubuntu.com/ubuntu/ jammy-security main restricted univer
 > [zpool-import.8 — OpenZFS documentation](https://openzfs.github.io/openzfs-docs/man/8/zpool-import.8.html)
 > [如何在 Ubuntu 上使用 ZFS 文件系统 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/33833767)
 > [ubuntu22.04挂载zfs_bpool rpool_ubuntu22.04的博客-CSDN博客](https://blog.csdn.net/qq_45677678/article/details/126990218)
-> [[Solved] "mount: unknown filesystem type 'zfs_member'" installing ZFS / Installation / Arch Linux Forums --- [已解决] “mount: unknown filesystem type 'zfs_member'” 安装 ZFS / 安装 / Arch Linux 论坛](https://bbs.archlinux.org/viewtopic.php?id=164124)
+> [[Solved] "mount: unknown filesystem type 'zfs_member'" installing ZFS / Installation / Arch Linux Forums --- [已解决] “mount: unknown filesystem type 'zfs_member'” 安装 ZFS / 安装 / Arch Linux 论坛]( https://bbs.archlinux.org/viewtopic.php?id=164124 )
+>[System Administration Commands (8) — OpenZFS documentation](https://openzfs.github.io/openzfs-docs/man/8/index.html) 
 
 ## 查询硬盘
 ```Shell
